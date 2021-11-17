@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 200px);
+            grid-template-rows: repeat(3, 200px);
+            align-content: center;
+
+
+        }
+
+        .box {
+            border: 2px solid black;
+        }
+
+        .box:nth-child(3n) {
+            border-right: 2px solid white;
+        }
+
+        .box:nth-child(1n) {
+            border-left: 2px solid white;
+        }
+
+        .box:nth-child(-n+3) {
+            border-top: 2px solid white;
+        }
+
+        .box:nth-child(n+7):nth-child(-n+10) {
+            border-bottom: 2px solid white;
+        }
+
+        .box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .x::before {
+            position: absolute;
+            content: "";
+            height: 100px;
+            width: 2px;
+            align-content: center;
+            transform: rotate(45deg);
+            background-color: black;
+            border: 10px solid black;
+        }
+
+        .x::after {
+            position: absolute;
+            content: "";
+            height: 100px;
+            width: 2px;
+            align-content: center;
+            transform: rotate(-45deg);
+            background-color: black;
+            border: 10px solid black;
+        }
+
+        .o::before {
+            position: absolute;
+            content: "";
+            height: 100px;
+            width: 100px;
+            border-radius: 100%;
+            align-content: center;
+            background-color: black;
+            border: 10px solid black;
+        }
+
+        .o::after {
+            position: absolute;
+            content: "";
+            height: 80px;
+            width: 80px;
+            border-radius: 100%;
+            align-content: center;
+            background-color: white;
+            border: 10px solid black;
+        }
+
+        .xturn .box:not(.x, .o):hover::before {
+            position: absolute;
+            content: "";
+            height: 100px;
+            width: 2px;
+            align-content: center;
+            transform: rotate(45deg);
+            background-color: lightgray;
+            border: 10px solid lightgray;
+        }
+
+        .xturn .box:not(.x, .o):hover::after {
+            position: absolute;
+            content: "";
+            height: 100px;
+            width: 2px;
+            align-content: center;
+            transform: rotate(-45deg);
+            background-color: lightgray;
+            border: 10px solid lightgray;
+        }
+
+        .oturn div.box:not(.o, .x):hover::before {
+            position: absolute;
+            content: "";
+            height: 100px;
+            width: 100px;
+            border-radius: 100%;
+            align-content: center;
+            background-color: lightgray;
+            border: 10px solid lightgray;
+        }
+
+        .oturn div.box:not(.o, .x):hover::after {
+            position: absolute;
+            content: "";
+            height: 80px;
+            width: 80px;
+            border-radius: 100%;
+            align-content: center;
+            background-color: white;
+            border: 10px solid lightgray;
+        }
+
+        .winner {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.795);
+            height: 100%;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 100px;
+            flex-direction: column;
+
+        }
+
+        .button:hover {
+            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+
+        }
+
+        .button {
+            display: inline-block;
+            border-radius: 4px;
+            background-color: #f4511e;
+            border: none;
+            color: #FFFFFF;
+            text-align: center;
+            font-size: 28px;
+            padding: 20px;
+            width: 200px;
+            transition: all 0.5s;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .button span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+
+        .button span:after {
+            content: '\00bb';
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            right: -20px;
+            transition: 0.5s;
+        }
+
+        .button:hover span {
+            padding-right: 25px;
+        }
+
+        .button:hover span:after {
+            opacity: 1;
+            right: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="board oturn">
+        <div class="box x" id=1></div>
+        <div class="box o" id=2></div>
+        <div class="box" id=3></div>
+        <div class="box x" id=4></div>
+        <div class="box" id=5></div>
+        <div class="box" id=6></div>
+        <div class="box " id=7></div>
+        <div class="box" id=8></div>
+        <div class="box" id=9></div>
+    </div>
+    <div class="winner">
+        <div class="winmessage">Has Won!</div>
+        <button class="button" style="vertical-align:middle"><span>Restart Game</span></button>
+
+    </div>
+
+</body>
+<script>
+    let turn = "o";
+
+    winMessage(false);
+
+    document.querySelectorAll('.box')
+        .forEach(e => e.addEventListener("click", clickHandler))
+
+
+    let grido = []
+    let gridx = []
+
+    function clickHandler() {
+        console.log(this);
+
+        if (turn == "o" && !this.classList.contains("o") && !this.classList.contains("x")) {
+
+            this.classList.add("o");
+            switchTurns(turn);
+            gameWin();
+            turn = "x"
+
+        } else if (turn == "x" && !this.classList.contains("x") && !this.classList.contains("o")) {
+
+            this.classList.add("x");
+            switchTurns(turn);
+            gameWin();
+            turn = "o"
+        }
+
+
+
+
+
+    }
+
+    function switchTurns(turn) {
+        if (turn == "o") {
+
+            document.querySelector(".board").classList.remove("oturn")
+            document.querySelector(".board").classList.add("xturn")
+        } else if (turn == "x") {
+            document.querySelector(".board").classList.remove("xturn")
+            document.querySelector(".board").classList.add("oturn")
+
+        }
+    }
+
+
+
+    const winningCombos = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+        [1, 4, 7],
+        [2, 5, 8],
+        [3, 6, 9],
+        [1, 5, 9],
+        [3, 5, 7]
+    ]
+
+    function gameWin() {
+
+
+        gridx = [];
+        grido = [];
+
+        let listofCells = Array.from(document.querySelectorAll('.box'))
+        // let testarray = [];
+        // debugger; 
+        for (i = 0; i < listofCells.length; i++) {
+            if (listofCells[i].className == "box o") {
+                grido.push(Number(listofCells[i].id));
+                if (grido.length == 3) {
+                    for (z = 0; z < winningCombos.length; z++) {
+                        if (JSON.stringify(winningCombos[z]) == JSON.stringify(grido)) {
+                            console.log("o")
+                            winMessage(true, "o")
+                            grido = []
+                            gridx = []
+                            return
+                        }
+                    }
+                }
+            } else if (listofCells[i].className == "box x") {
+                gridx.push(Number(listofCells[i].id));
+                if (gridx.length == 3) {
+                    for (z = 0; z < winningCombos.length; z++) {
+                        if (JSON.stringify(winningCombos[z]) == JSON.stringify(gridx)) {
+                            console.log("x")
+                            console.log(turn);
+                            winMessage(true, "x")
+                            gridx = [];
+                            grido = [];
+                            return
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function winMessage(gameValue, player) {
+        let selectWin = document.querySelector(".winner");
+        let winMessage = document.querySelector(".winmessage")
+        if (gameValue) {
+            selectWin.style.display = "flex";
+            document.querySelector(".winmessage").innerHTML = `Player "${player.toUpperCase()}" has won`
+        }
+
+        else if (!gameValue) {
+            selectWin.style.display = "none"
+        }
+
+    }
+
+
+    // function drawCheck(){
+    //     let listofCells = document.querySelectorAll('.box')
+
+    //     if (!Array.from(listofCells).includes("div.box.x") && !Array.from(listofCells).includes("div.box.o")){
+    //         winMessage(true);
+    //     } }    
+
+    //     winMessage(false);
+
+
+    //place mark 
+    //check for a win or a draw or a loss
+    //switch players 
+    //repeat 
+
+    let button = document.querySelector("button")
+    button.addEventListener("click", restart);
+
+    function restart(){
+        gridx = [];
+        grido = [];
+       winMessage(false);
+        document.querySelectorAll('.box')
+            .forEach(e => 
+               { e.classList.remove("x")
+                e.classList.remove("o")}
+            )
+    }
+    
+
+</script>
+
+</html>
